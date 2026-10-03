@@ -1,0 +1,21 @@
+{
+  "name": "projectmate-backend",
+  "version": "1.0.0",
+  "description": "it is the backend for projectmate website",
+  "keywords": [
+    "nodejs",
+    "express",
+    "mangodb"
+  ],
+  "license": "ISC",
+  "author": "veDev-05",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "dev" : "nodemon src/app.js",
+    "start": "node src/app.js"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
