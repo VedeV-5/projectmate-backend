@@ -2,16 +2,14 @@ const express  = require("express");
 
 const app = express();
 
-app.use("/",(req, res, next) => {
-    res.send("got to the home page")
-})
+const {authMiddleware} = require("./middlewares/authMiddleware")
+const {adminMiddleware}  = require("./middlewares/adminMiddleware")
 
-app.use("/hello",(req, res, next)=>{
-    res.send("got to the hello page ")
-})
+app.use("/admin", authMiddleware, adminMiddleware)
 
-app.use("/about",(req, res, next) => {
-    res.send("got to the about page")
+app.get("/admin/data",(req, res) => {
+    res.send("data take admin")
+
 })
 
 app.listen(555,()=> { console.log("server is listening at port 555") })
