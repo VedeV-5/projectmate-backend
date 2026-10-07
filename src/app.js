@@ -1,15 +1,15 @@
 const express  = require("express");
-
 const app = express();
 
-const {authMiddleware} = require("./middlewares/authMiddleware")
-const {adminMiddleware}  = require("./middlewares/adminMiddleware")
+const {databaseConnect} = require("./config/database")
 
-app.use("/admin", authMiddleware, adminMiddleware)
+databaseConnect()
+    .then(() => {
+        console.log("DB connected successfully")
+        app.listen(555,()=> { console.log("server is listening at port 555") })
+    })
+    .catch((err) => {
+        console.error("DB connection failed:", err)
+    })
 
-app.get("/admin/data",(req, res) => {
-    res.send("data take admin")
 
-})
-
-app.listen(555,()=> { console.log("server is listening at port 555") })
