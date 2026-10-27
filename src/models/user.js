@@ -54,6 +54,7 @@ const userSchema = new Schema({
     },
     skills : {
         type : [String],
+        required : true,
         validate : [
             {
                 validator : (skills) => {
