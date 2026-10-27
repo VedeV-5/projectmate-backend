@@ -2,18 +2,37 @@ const express  = require("express");
 const app = express();
 const {databaseConnect} = require("./config/database");
 const User = require("./models/user");
+const bcrypt = require("bcrypt")
 
 app.use(express.json())
 
-const validateSignup = require("./middlewares/vallidateSignup")
+const validateSignup = require("./middlewares/validateSignup")
 const checkAllowedFields = require("./middlewares/checkAllowedFields")
 
 app.post("/signup", validateSignup, async (req, res) => {
-        
-    const user = new User(req.body)
+
+    // After validating ->> destructring the reqBody
+    const {firstName, lastName, email, password, age, gender, skills} = req.body;
+
     try{
+        // Hash the passoword
+        const passwordHash = await bcrypt.hash(password, 10)
+
+        // Create the user document
+        const user = new User({
+            firstName,
+            lastName,
+            email,
+            password : passwordHash,
+            age,
+            gender,
+            skills
+        })
+
+        // Save the user in mongoDB
         const savedUser = await user.save()
-        console.log(savedUser);
+        
+        // Return a successful response
         return res.status(201).json({
             message: "User registered successfully.",
             user : savedUser,
@@ -36,12 +55,49 @@ app.post("/signup", validateSignup, async (req, res) => {
                 message : "Invalid user data."
             })
         }
-  
+        
+        // Handle unexpected error
         return res.status(500).json({
             message : "Internal error occured."
         })
     }
     
+})
+
+app.post("/login",async (req, res) => {
+    const {email, password} = req.body;
+    try{
+        // Find the user by email   
+        const user = await User.findOne({email})
+        
+        // Check whether user exits
+        if(!user){
+            return  res.status(404).json({
+                message: "Invalid email or password."
+            })
+        }
+
+        // Now checking the password is Correct or not
+        const isPasswordValid = await bcrypt.compare(password, user.password)
+
+        if(!isPasswordValid){
+            return res.status(400).json({
+                message: "Invalid email or password."
+            })
+        }
+
+        return res.status(200).json({
+            message : "Login successful."
+        })
+    }
+    catch(err){
+        console.log("Login error : ", err)
+
+        return res.status(500).json({
+            message : "Internal server error."
+        })
+    }
+
 })
 
 app.get("/feed", async (req, res) =>{
